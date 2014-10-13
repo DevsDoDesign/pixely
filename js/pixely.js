@@ -1,14 +1,14 @@
 var colors = [
-	'rgb(255,255,255)',
-	'rgb(0,0,0)',
-	'rgb(255,0,0)',
-	'rgb(255,152,0)',
-	'rgb(255,255,0)',
-	'rgb(51,252,3)',
-	'rgb(0,153,255)',
-	'rgb(130,130,130)',
-	'rgb(255,153,255)',
-	'rgb(0,51,102)'
+	'#FFFFFF',
+	'#000000',
+	'#FF0000',
+	'#FF9800',
+	'#FFFF00',
+	'#33FC03',
+	'#0099FF',
+	'#828282',
+	'#FF99FF',
+	'#003366'
 ];
 
 var size = 20;
@@ -36,17 +36,13 @@ for (var i = 0; i < size; i++) {
 	var drawCanvas = document.getElementById('draw-canvas');
 
 	var tr = document.createElement('tr');
-	tr.id = 'tr-'+i;
 
 	drawCanvas.appendChild(tr);
 
 	for (var j = 0; j < size; j++) {
-		var row = document.getElementById('tr-'+i);
-
 		var td = document.createElement('td');
 		td.className = 'drawable';
-
-		row.appendChild(td);
+		tr.appendChild(td);
 	};
 
 	fillTd = document.createElement('td');
@@ -54,20 +50,8 @@ for (var i = 0; i < size; i++) {
 	button.className = 'fill';
 	button.innerHTML = 'Fill';
 	fillTd.appendChild(button);
-	row.appendChild(fillTd);
+	tr.appendChild(fillTd);
 };
-
-var colorMap = (function() {
-	var map = JSON.stringify(colors);
-	return {
-		fromColor: function(color) {
-			return map[color ? color : 'rgb(0,0,0)'];
-		},
-		getAll: function() {
-			return map;
-		}
-	}
-})();
 
 var getColor = function() { return document.querySelector('[name=color]:checked').value; }
 
@@ -102,23 +86,26 @@ qs2ar('button.fill').forEach(function(btn) {
 	});
 });
 
-var downloadCanvas = function(link, canvasId, filename) {
-    link.href = document.getElementById(canvasId).toDataURL();
-    link.download = filename;
-}
-
 document.querySelector('#generate').addEventListener('click', function(btn) {
-	document.getElementById('draw-canvas').className = 'hidden';
-	var oldCanvas = document.getElementById('draw-canvas');
+	var canvas = document.createElement('canvas');
+	var scale = 20;
+	var width = size * scale;
+	var ctx = canvas.getContext('2d');
+	canvas.width = canvas.height = width;
+	canvas.style.width = canvas.style.height = width + 'px';
 
-	html2canvas(oldCanvas, {
-		onrendered: function(canvas) {
-			canvas.id = 'download-canvas';
-			canvas.style.display = 'none';
-			document.body.appendChild(canvas);
-			var url = document.getElementById('download-canvas').toDataURL();
-			oldCanvas.className = oldCanvas.className.replace( /(?:^|\s)hidden(?!\S)/ , '' );
-			window.open(url);
+	var x = y = 0;
+	cells.forEach(function(cell) {
+		if (x == 20) {
+			y++;
+			x = 0;
 		}
+
+		ctx.fillStyle = cell.style.background || '#000000';
+		ctx.fillRect(x * scale, y * scale, 1 * scale, 1 * scale);
+
+		x++;
 	});
+
+	window.open(canvas.toDataURL(), '_blank')
 });
