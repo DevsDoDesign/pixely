@@ -4,4 +4,4 @@ For [Pub Hack](http://pubhack.co.uk), [Dan](http://twitter.com/danharper7) built
 
 This is that drawing tool modified to convert to canvas for download.
 
-[http://code.robblewis.me/pixely/](http://code.robblewis.me/pixely/)
+[http://devsdodesign.com/pixely/](http://devsdodesign.com/pixely/)
