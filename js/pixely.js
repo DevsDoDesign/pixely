@@ -53,6 +53,19 @@ for (var i = 0; i < size; i++) {
 	tr.appendChild(fillTd);
 };
 
+// Add a row of fill buttons to the bottom
+var tr = document.createElement('tr');
+drawCanvas.appendChild(tr);
+for (var j = 0; j < size; j++) {
+	fillTd = document.createElement('td');
+	button = document.createElement('button');
+	button.className = 'fillUp';
+	button.innerHTML = 'Fill';
+	button.dataset.count = j;
+	fillTd.appendChild(button);
+	tr.appendChild(fillTd);
+};
+
 var getColor = function() { return document.querySelector('[name=color]:checked').value; }
 
 // nodelist to array
@@ -120,6 +133,16 @@ cells.forEach(function(cell) {
 qs2ar('button.fill').forEach(function(btn) {
 	btn.addEventListener('click', function() {
 		nl2ar(btn.parentNode.parentNode.querySelectorAll('td.drawable')).forEach(function(cell) {
+			fillCell(cell);
+			generateFavicon();
+		});
+	});
+});
+// Add listener to the fillUp buttons to fill the columns
+qs2ar('button.fillUp').forEach(function(btn) {
+	btn.addEventListener('click', function() {
+		var column = (parseInt(this.dataset.count) + 1);
+		nl2ar(document.querySelectorAll('td.drawable:nth-child(' + column + ')')).forEach(function(cell) {
 			fillCell(cell);
 			generateFavicon();
 		});
