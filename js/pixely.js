@@ -53,6 +53,19 @@ for (var i = 0; i < size; i++) {
 	tr.appendChild(fillTd);
 };
 
+// Add a row of fill buttons to the bottom
+var tr = document.createElement('tr');
+drawCanvas.appendChild(tr);
+for (var j = 0; j < size; j++) {
+	fillTd = document.createElement('td');
+	button = document.createElement('button');
+	button.className = 'fillUp';
+	button.innerHTML = 'Fill';
+	button.dataset.count = j;
+	fillTd.appendChild(button);
+	tr.appendChild(fillTd);
+};
+
 var getColor = function() { return document.querySelector('[name=color]:checked').value; }
 
 // nodelist to array
@@ -60,33 +73,8 @@ var nl2ar = function(nl) { return Array.prototype.slice.call(nl); };
 // query selector string to array
 var qs2ar = function(selector) { return nl2ar(document.querySelectorAll(selector)); };
 
-var cells = qs2ar('td.drawable');
-
-var drawing = false;
-document.addEventListener('mousedown', function() { drawing = true; });
-document.addEventListener('mouseup', function() { drawing = false; });
-
-var fillCell = function(cell) { cell.style.background = getColor(); }
-
-cells.forEach(function(cell) {
-	cell.addEventListener('mousedown', function() {
-		fillCell(cell);
-	});
-	cell.addEventListener('mouseover', function() {
-		if ( ! drawing) return;
-		fillCell(cell);
-	});
-});
-
-qs2ar('button.fill').forEach(function(btn) {
-	btn.addEventListener('click', function() {
-		nl2ar(btn.parentNode.parentNode.querySelectorAll('td.drawable')).forEach(function(cell) {
-			fillCell(cell);
-		});
-	});
-});
-
-document.querySelector('#generate').addEventListener('click', function(btn) {
+// Generate the image from canvas
+var generateImage = function() {
 	var canvas = document.createElement('canvas');
 	var scale = 20;
 	var width = size * scale;
@@ -107,5 +95,61 @@ document.querySelector('#generate').addEventListener('click', function(btn) {
 		x++;
 	});
 
-	window.open(canvas.toDataURL(), '_blank')
+	return canvas.toDataURL('image/png');
+}
+
+// Generate the favicon
+var generateFavicon = function() {
+	var head = document.getElementsByTagName("head")[0];
+	var img = document.createElement('img');
+	var favicon = document.getElementById('favicon');
+	var link = favicon.cloneNode(true);
+
+	head.removeChild(favicon);
+	link.href = generateImage();
+	head.appendChild(link);
+}
+
+var cells = qs2ar('td.drawable');
+
+var drawing = false;
+document.addEventListener('mousedown', function() { drawing = true; });
+document.addEventListener('mouseup', function() { drawing = false; });
+
+var fillCell = function(cell) { cell.style.background = getColor(); }
+
+cells.forEach(function(cell) {
+	cell.addEventListener('mousedown', function() {
+		fillCell(cell);
+		generateFavicon();
+	});
+	cell.addEventListener('mouseover', function() {
+		if ( ! drawing) return;
+		fillCell(cell);
+		generateFavicon();
+	});
+});
+
+qs2ar('button.fill').forEach(function(btn) {
+	btn.addEventListener('click', function() {
+		nl2ar(btn.parentNode.parentNode.querySelectorAll('td.drawable')).forEach(function(cell) {
+			fillCell(cell);
+			generateFavicon();
+		});
+	});
+});
+// Add listener to the fillUp buttons to fill the columns
+qs2ar('button.fillUp').forEach(function(btn) {
+	btn.addEventListener('click', function() {
+		var column = (parseInt(this.dataset.count) + 1);
+		nl2ar(document.querySelectorAll('td.drawable:nth-child(' + column + ')')).forEach(function(cell) {
+			fillCell(cell);
+			generateFavicon();
+		});
+	});
+});
+
+document.querySelector('#generate').addEventListener('click', function(btn) {
+	var canvas = generateImage();
+	window.open(canvas, '_blank');
 });

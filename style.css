@@ -39,8 +39,8 @@ table {
 	margin: 0 auto;
 }
 td.drawable {
-	width: 20px;
-	height: 20px;
+	width: 35px;
+	height: 35px;
 	background: black;
 }
 input[type=radio] {
